@@ -52,6 +52,8 @@ services:
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+    volumes:
+      - ./Kafka:/opt/flink-plugins
 
   # Flink TaskManager (실제 데이터 처리 수행)
   flink-taskmanager:
@@ -64,6 +66,8 @@ services:
     command: taskmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=flink-jobmanager
+    volumes:
+      - ./Kafka:/opt/flink-plugins
 
   # FastAPI 서비스 (Docker에서 실행 시)
   fastapi:
