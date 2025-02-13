@@ -59,11 +59,21 @@ source_table = table_env.from_path("CsvTable")
 result = source_table.rename_columns(
     col("name").alias("unji_name")
 )
-result.execute().print()
-#query = table_env.sql_query("""
-#    SELECT * from CsvTable where id>=2
-#        """)
-#query.execute().print()
 
-#print(table_env.get_current_catalog())
+import socket
 
+def check_kafka_port(host="localhost", port=29092):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(3)  # 3초 동안 응답 없으면 실패 처리
+    try:
+        sock.connect((host, port))
+        print(f"✅ Kafka 포트 {port} 가 열려 있습니다!")
+        return True
+    except socket.error:
+        print(f"❌ Kafka 포트 {port} 가 닫혀 있습니다.")
+        return False
+    finally:
+        sock.close()
+
+# 실행
+check_kafka_port()
