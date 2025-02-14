@@ -1,4 +1,5 @@
 import json
+import time
 from fastapi import FastAPI
 from confluent_kafka import Producer
 from pydantic import BaseModel
@@ -24,6 +25,7 @@ class Movie(BaseModel):
 
 @app.post("/send_message/")
 async def send_message(movie: Movie):
+    start_time = time.perf_counter()  # 메시지 전송 시작 시간 기록
     """
     Kafka로 메시지를 전송하고 JSON 응답을 반환하는 API 엔드포인트
     """
@@ -36,10 +38,17 @@ async def send_message(movie: Movie):
         producer.produce("test-topic", key=None, value=json.dumps(message, ensure_ascii=False).encode("utf-8"))
         producer.flush()
 
+        end_time = time.perf_counter()
+        elapsed_time = end_time - start_time
+
         response_data = {
             "status": "Message sent",
-            "message": message
+            "message": message,
+            "elapsed_time": f"{elapsed_time:.5f} 초"
         }
+
+        print(f"⏳ [FastAPI 응답 속도] {elapsed_time:.5f} 초")
+
         return JSONResponse(content=response_data, status_code=200)
     except Exception as e:
         error_response = {
